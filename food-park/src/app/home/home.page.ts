@@ -4,12 +4,14 @@ import { Router } from '@angular/router';
 import { produtoService } from '../services/produtoService';
 import { Produto } from '../models/produto';
 import { IONIC_ELEMENTS } from '../imports';
+import { ProdutoCardComponent } from '../components/produto-card/produto-card.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IONIC_ELEMENTS],
+  imports: [IONIC_ELEMENTS, ProdutoCardComponent, CommonModule],
 })
 export class HomePage {
 

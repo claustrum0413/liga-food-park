@@ -1,15 +1,4 @@
 import { Injectable } from '@angular/core';
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  Timestamp,
-} from 'firebase/firestore';
-import { db } from '../firebase.config';
 import { Produto } from '../models/produto';
 
 @Injectable({ providedIn: 'root' })

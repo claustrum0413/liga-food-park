@@ -25,17 +25,18 @@ body{background:#fff;padding:16px 12px 32px}
 
 </head>
 <body>
-  
 
-<p class="exemplo">EXEMPLO VISUAL</p>
+
 <div class="grid">
   <div class="bloco">
     <div class="fone">
       <div class="tb"><span>Food Park</span><span style="font-weight:600;font-size:0.8rem;">sair</span></div>
       <div class="pad">
         <span class="chip">Todos</span><span class="chip on">Smash IF</span><span class="chip">La Fiesta</span><span class="chip">Gelato</span>
-        <div class="item" style="margin-top:8px;"><div><strong>Burger smash</strong><div class="muted">Smash IF</div></div><div class="preco">R$ 22</div></div>
-        <div class="item"><div><strong>Batata cheddar</strong><div class="muted">Smash IF</div></div><div class="preco">R$ 14</div></div>
+        <div *ngFor="let produto of produtos">
+          <app-produto-card
+          [produto]="produto"></app-produto-card>
+        </div>
         <button class="btn main">Ver combo (0)</button>
       </div>
     </div>
