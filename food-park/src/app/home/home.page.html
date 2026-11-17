@@ -1,61 +1,42 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Print · Food Park</title>
-<style>
-body{background:#fff;padding:16px 12px 32px}
-.exemplo{text-align:center;font-size:0.72rem;letter-spacing:0.16em;font-weight:800;color:#94a3b8;margin:0 0 12px}
-.bloco h2{display:none}
-.fone{box-shadow:none;border:0;border-radius:12px;min-height:0}
-.tb{background:#65a30d}
-.btn.main{background:#65a30d}
-</style>
-
 <ion-header>
   <ion-toolbar>
     <ion-title>Food Park</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="finalizar()">Finalizar Pedido</ion-button>
+      <ion-button (click)="verCombo()">Ver combo ({{ qtdCombo }})</ion-button>
       <ion-button (click)="sair()">Sair</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-</head>
-<body>
+<ion-content class="ion-padding">
 
+  <div class="filtros">
+    <ion-button
+      size="small"
+      shape="round"
+      [fill]="categoriaAtual === 'todas' ? 'solid' : 'outline'"
+      (click)="filtrar('todas')">
+      Todos
+    </ion-button>
 
-<div class="grid">
-  <div class="bloco">
-    <div class="fone">
-      <div class="tb"><span>Food Park</span><span style="font-weight:600;font-size:0.8rem;">sair</span></div>
-      <div class="pad">
-        <span class="chip">Todos</span><span class="chip on">Smash IF</span><span class="chip">La Fiesta</span><span class="chip">Gelato</span>
-        <div *ngFor="let produto of produtos">
-          <app-produto-card
-          [produto]="produto"></app-produto-card>
-        </div>
-        <button class="btn main">Ver combo (0)</button>
-      </div>
-    </div>
+    @for (categoria of categorias; track categoria) {
+      <ion-button
+        size="small"
+        shape="round"
+        [fill]="categoriaAtual === categoria ? 'solid' : 'outline'"
+        (click)="filtrar(categoria)">
+        {{ categoria }}
+      </ion-button>
+    }
   </div>
-  <div class="bloco">
-    <div class="fone">
-      <div class="tb"><span>Combo</span><span style="font-weight:600;font-size:0.8rem;">voltar</span></div>
-      <div class="pad">
-        <div class="item"><div><strong>Burger smash</strong></div><div class="preco">R$ 22</div></div>
-        <div class="item"><div><strong>Taco</strong></div><div class="preco">R$ 18</div></div>
-        <div class="total">
-          <div class="linha"><span>Subtotal</span><span>R$ 40,00</span></div>
-          <div class="linha"><span>Taxa de entrega</span><span>R$ 3,00</span></div>
-          <div class="linha g"><span>Total</span><span>R$ 43,00</span></div>
-        </div>
-        <button class="btn main">Pedir</button>
-      </div>
-    </div>
-  </div>
-</div>
-</body>
-</html>
+
+  @for (produto of produtos; track produto.id) {
+    <app-produto-card
+      [produto]="produto"
+      [noCarrinho]="produtoService.estaNoCarrinho(produto.id)"
+      (adicionar)="adicionar($event)"
+      (remover)="remover($event)">
+    </app-produto-card>
+  }
+
+</ion-content>

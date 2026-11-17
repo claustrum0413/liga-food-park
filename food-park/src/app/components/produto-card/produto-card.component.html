@@ -1,12 +1,28 @@
-<ion-card *ngIf="produto">
-  <ion-card-header>
-    <span><b>{{ produto.nome }}</b></span>
-  </ion-card-header>
+@if (produto) {
+  <ion-card>
+    <ion-card-header>
+      <span><b>{{ produto.nome }}</b></span>
 
-  <ion-card-content>
-    <p class="truck">{{ produto.truck }}</p>
-    <p><b>Preço: {{ produto.preco }}</b></p>
-    <ion-button (click)="adicionarPedido(produto)">Adicionar ao pedido</ion-button>
-  </ion-card-content>
+      @if (situacao === 'esgotado') {
+        <ion-badge color="danger" class="aviso-estoque">Esgotado</ion-badge>
+      } @else if (situacao === 'acabando') {
+        <ion-badge color="warning" class="aviso-estoque">
+          Acabando: {{ produto.estoque === 1 ? 'resta 1' : 'restam ' + produto.estoque }}
+        </ion-badge>
+      }
+    </ion-card-header>
 
-</ion-card>
+    <ion-card-content>
+      <p class="truck">{{ produto.truck }} · {{ produto.categoria }}</p>
+      <p><b>Preço: {{ precoFormatado }}</b></p>
+
+      @if (noCarrinho) {
+        <ion-button color="medium" (click)="remover.emit(produto)">Remover do combo</ion-button>
+      } @else {
+        <ion-button [disabled]="situacao === 'esgotado'" (click)="adicionar.emit(produto)">
+          Adicionar ao combo
+        </ion-button>
+      }
+    </ion-card-content>
+  </ion-card>
+}

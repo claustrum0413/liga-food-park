@@ -3,4 +3,6 @@ export interface Produto {
   nome: string;
   preco: number;
   truck: string;
+  categoria: string;
+  estoque: number;
 }
