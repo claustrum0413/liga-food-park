@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Produto } from '../models/produto';
 
 export type SituacaoEstoque = 'ok' | 'acabando' | 'esgotado';
@@ -15,17 +16,23 @@ export class produtoService {
     { id: 2, nome: 'Brigadeiro', preco: 20, truck: 'SmashIFSC', categoria: 'Sobremesa', estoque: 2 },
     { id: 3, nome: 'Pudim de leite', preco: 15, truck: 'SmashIFSC', categoria: 'Sobremesa', estoque: 0 },
     { id: 4, nome: 'Burger smash', preco: 22, truck: 'SmashIFSC', categoria: 'Lanche', estoque: 8 },
-    { id: 5, nome: 'Taco', preco: 18, truck: 'La Fiesta', categoria: 'Lanche', estoque: 3 },
-    { id: 6, nome: 'Refrigerante', preco: 8, truck: 'La Fiesta', categoria: 'Bebida', estoque: 20 },
-    { id: 7, nome: 'Gelato de pistache', preco: 16, truck: 'Gelato', categoria: 'Sobremesa', estoque: 5 },
+    { id: 5, nome: 'Suco natural', preco: 12, truck: 'SmashIFSC', categoria: 'Bebida', estoque: 9 },
+    { id: 6, nome: 'Taco', preco: 18, truck: 'La Fiesta', categoria: 'Lanche', estoque: 8 },
+    { id: 7, nome: 'Refrigerante', preco: 8, truck: 'La Fiesta', categoria: 'Bebida', estoque: 2 },
+    { id: 8, nome: 'Batata rústica da La Fiesta', preco: 30, truck: 'La Fiesta', categoria: 'Porção', estoque: 6 },
+    { id: 9, nome: 'Churros da La Fiesta', preco: 18, truck: 'La Fiesta', categoria: 'Sobremesa', estoque: 4 },
+    { id: 10, nome: 'Gelato de pistache', preco: 16, truck: 'Gelato', categoria: 'Sobremesa', estoque: 6 },
+    { id: 11, nome: 'Porção de pão de alho', preco: 28, truck: 'Gelato', categoria: 'Porção', estoque: 7 },
+    { id: 12, nome: 'Misto quente', preco: 24, truck: 'Gelato', categoria: 'Lanche', estoque: 0 },
+    { id: 13, nome: 'Limonada gelada', preco: 10, truck: 'Gelato', categoria: 'Bebida', estoque: 3 },
   ];
 
   carrinho: Produto[] = [];
+  carrinho$ = new BehaviorSubject<Produto[]>([]);
 
   constructor() {
     this.carregarCarrinho();
   }
-
 
   listar(): Produto[] {
     return this.produtos;
@@ -37,6 +44,10 @@ export class produtoService {
 
   categorias(): string[] {
     return [...new Set(this.produtos.map(p => p.categoria))];
+  }
+
+  trucks(): string[] {
+    return [...new Set(this.produtos.map(p => p.truck))];
   }
 
   filtrarPorCategoria(categoria: string): Produto[] {
@@ -71,15 +82,40 @@ export class produtoService {
     }).format(valor);
   }
 
-  
+  private podeUsarStorage(): boolean {
+    return typeof window !== 'undefined' && !!window.localStorage;
+  }
 
   carregarCarrinho() {
-    const salvo = localStorage.getItem(CHAVE_CARRINHO);
-    this.carrinho = salvo ? JSON.parse(salvo) : [];
+    if (!this.podeUsarStorage()) {
+      this.carrinho = [];
+      this.carrinho$.next(this.carrinho);
+      return;
+    }
+
+    try {
+      const salvo = window.localStorage.getItem(CHAVE_CARRINHO);
+      const itens = salvo ? JSON.parse(salvo) : [];
+      this.carrinho = Array.isArray(itens) ? itens : [];
+    } catch {
+      this.carrinho = [];
+    }
+
+    this.carrinho$.next(this.carrinho);
   }
 
   private salvarCarrinho() {
-    localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(this.carrinho));
+    if (!this.podeUsarStorage()) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(this.carrinho));
+    } catch {
+      // ignora falha de persistência no navegador
+    }
+
+    this.carrinho$.next(this.carrinho);
   }
 
   estaNoCarrinho(id: number): boolean {
@@ -90,7 +126,8 @@ export class produtoService {
     if (!this.estaDisponivel(produto) || this.estaNoCarrinho(produto.id)) {
       return false;
     }
-    this.carrinho.push(produto);
+
+    this.carrinho = [...this.carrinho, produto];
     this.salvarCarrinho();
     return true;
   }
@@ -120,5 +157,4 @@ export class produtoService {
   total(): number {
     return this.subtotal() + this.taxaEntrega();
   }
-
 }

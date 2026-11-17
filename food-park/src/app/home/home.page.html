@@ -2,6 +2,8 @@
   <ion-toolbar>
     <ion-title>Food Park</ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="abrirMenu()" [fill]="abaAtual === 'menu' ? 'solid' : 'outline'">Menu</ion-button>
+      <ion-button (click)="abrirRoleta()" [fill]="abaAtual === 'roleta' ? 'solid' : 'outline'">Roleta</ion-button>
       <ion-button (click)="verCombo()">Ver combo ({{ qtdCombo }})</ion-button>
       <ion-button (click)="sair()">Sair</ion-button>
     </ion-buttons>
@@ -10,33 +12,101 @@
 
 <ion-content class="ion-padding">
 
-  <div class="filtros">
-    <ion-button
-      size="small"
-      shape="round"
-      [fill]="categoriaAtual === 'todas' ? 'solid' : 'outline'"
-      (click)="filtrar('todas')">
-      Todos
-    </ion-button>
+  @if (abaAtual === 'roleta') {
+    <div class="slot-container">
+      <div class="slot-header">
+        <p>Roleta</p>
+      </div>
 
-    @for (categoria of categorias; track categoria) {
+      <div class="slots-wrapper">
+        <div class="slot-box" [class.girando]="slotTruckGirando" [class.finalizado]="truckSorteado">
+          <div class="slot-viewport">
+            <div class="slot-list" [style.transform]="'translateY(' + truckSlotOffset + 'px)'">
+              @for (truck of slotTruckItems; track truck) {
+                <div class="slot-item">{{ truck }}</div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="slot-box slot-box-middle" [class.girando]="slotProdutoGirando" [class.finalizado]="produtoSorteado">
+          <div class="slot-viewport">
+            <div class="slot-list" [style.transform]="'translateY(' + produtoSlotOffset + 'px)'">
+              @for (produto of slotProdutoItems; track produto.id) {
+                <div class="slot-item">{{ produto.nome }}</div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ion-button class="btn-girar" (click)="girarSlots()" [disabled]="slotTruckGirando || slotProdutoGirando">
+        {{ slotTruckGirando || slotProdutoGirando ? 'Girando...' : 'Girar' }}
+      </ion-button>
+
+      @if (truckSorteado && produtoSorteado) {
+        <div class="resultado-roleta resultado-roleta-ativo">
+          <p>Resultado:</p>
+          <h3>{{ truckSorteado }} · {{ produtoSorteado.nome }}</h3>
+          <ion-button class="btn-adicionar-roleta" (click)="adicionar(produtoSorteado)">
+            Adicionar ao combo
+          </ion-button>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="filtros">
       <ion-button
         size="small"
         shape="round"
-        [fill]="categoriaAtual === categoria ? 'solid' : 'outline'"
-        (click)="filtrar(categoria)">
-        {{ categoria }}
+        [fill]="categoriaAtual === 'todas' ? 'solid' : 'outline'"
+        (click)="filtrar('todas')">
+        Todos
       </ion-button>
-    }
-  </div>
 
-  @for (produto of produtos; track produto.id) {
-    <app-produto-card
-      [produto]="produto"
-      [noCarrinho]="produtoService.estaNoCarrinho(produto.id)"
-      (adicionar)="adicionar($event)"
-      (remover)="remover($event)">
-    </app-produto-card>
+      @for (categoria of categorias; track categoria) {
+        <ion-button
+          size="small"
+          shape="round"
+          [fill]="categoriaAtual === categoria ? 'solid' : 'outline'"
+          (click)="filtrar(categoria)">
+          {{ categoria }}
+        </ion-button>
+      }
+    </div>
+
+    <div class="filtros filtros-truck">
+      <ion-button
+        size="small"
+        shape="round"
+        [fill]="truckAtual === 'todos' ? 'solid' : 'outline'"
+        (click)="filtrarPorTruck('todos')">
+        Todos os trucks
+      </ion-button>
+
+      @for (truck of trucks; track truck) {
+        <ion-button
+          size="small"
+          shape="round"
+          [fill]="truckAtual === truck ? 'solid' : 'outline'"
+          (click)="filtrarPorTruck(truck)">
+          {{ truck }}
+        </ion-button>
+      }
+    </div>
+
+    <div class="produto-grid">
+      @for (produto of produtos; track produto.id) {
+        <div class="produto-grid-item">
+          <app-produto-card
+            [produto]="produto"
+            [noCarrinho]="produtoService.estaNoCarrinho(produto.id)"
+            (adicionar)="adicionar($event)"
+            (remover)="remover($event)">
+          </app-produto-card>
+        </div>
+      }
+    </div>
   }
 
 </ion-content>

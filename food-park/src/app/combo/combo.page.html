@@ -8,30 +8,50 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <div class="combo-page" [class.blurred]="compraFinalizada">
+    <div class="combo-container">
+      @if (itens.length === 0) {
+        <p class="vazio">Seu combo está vazio. Volte ao menu e adicione algo!</p>
+      } @else {
+        <ion-list>
+          @for (item of itens; track item.id) {
+            <ion-item>
+              <ion-label>
+                <h2>{{ item.nome }}</h2>
+                <p>{{ item.truck }}</p>
+              </ion-label>
+              <span slot="end">{{ produtoService.formatarPreco(item.preco) }}</span>
+              <ion-button slot="end" fill="clear" color="danger" (click)="remover(item)">
+                Remover
+              </ion-button>
+            </ion-item>
+          }
+        </ion-list>
 
-  @if (itens.length === 0) {
-    <p class="vazio">Seu combo está vazio. Volte ao menu e adicione algo!</p>
-  } @else {
-    <ion-list>
-      @for (item of itens; track item.id) {
-        <ion-item>
-          <ion-label>
-            <h2>{{ item.nome }}</h2>
-            <p>{{ item.truck }}</p>
-          </ion-label>
-          <span slot="end">{{ produtoService.formatarPreco(item.preco) }}</span>
-          <ion-button slot="end" fill="clear" color="danger" (click)="remover(item)">
-            Remover
-          </ion-button>
-        </ion-item>
+        <div class="total">
+          <div class="linha"><span>Subtotal</span><span>{{ produtoService.formatarPreco(produtoService.subtotal()) }}</span></div>
+          <div class="linha"><span>Taxa de entrega</span><span>{{ produtoService.formatarPreco(produtoService.taxaEntrega()) }}</span></div>
+          <div class="linha g"><span>Total</span><span>{{ produtoService.formatarPreco(produtoService.total()) }}</span></div>
+        </div>
+
+        <ion-button
+          expand="block"
+          color="success"
+          (click)="finalizarCompra()"
+          class="ion-margin-top finalizar-compra-btn">
+          Finalizar compra
+        </ion-button>
       }
-    </ion-list>
+    </div>
+  </div>
 
-    <div class="total">
-      <div class="linha"><span>Subtotal</span><span>{{ produtoService.formatarPreco(produtoService.subtotal()) }}</span></div>
-      <div class="linha"><span>Taxa de entrega</span><span>{{ produtoService.formatarPreco(produtoService.taxaEntrega()) }}</span></div>
-      <div class="linha g"><span>Total</span><span>{{ produtoService.formatarPreco(produtoService.total()) }}</span></div>
+  @if (compraFinalizada) {
+    <div class="success-overlay">
+      <div class="success-card">
+        <h2>Compra finalizada com sucesso!</h2>
+        <p>Seu pedido foi registrado e logo será preparado.</p>
+        <ion-button expand="block" (click)="fecharMensagemSucesso()">Voltar ao menu</ion-button>
+      </div>
     </div>
   }
-
 </ion-content>

@@ -1,25 +1,29 @@
 @if (produto) {
   <ion-card>
     <ion-card-header>
-      <span><b>{{ produto.nome }}</b></span>
-
-      @if (situacao === 'esgotado') {
-        <ion-badge color="danger" class="aviso-estoque">Esgotado</ion-badge>
-      } @else if (situacao === 'acabando') {
-        <ion-badge color="warning" class="aviso-estoque">
-          Acabando: {{ produto.estoque === 1 ? 'resta 1' : 'restam ' + produto.estoque }}
-        </ion-badge>
-      }
+      <div class="produto-cabecalho">
+        <span class="produto-nome"><b>{{ produto.nome }}</b></span>
+      </div>
     </ion-card-header>
 
-    <ion-card-content>
+    <ion-card-content class="produto-card-content">
+      @if (!noCarrinho) {
+        @if (situacao === 'esgotado') {
+          <span class="aviso-estoque badge-esgotado">Esgotado</span>
+        } @else if (situacao === 'acabando') {
+          <span class="aviso-estoque badge-acabando">
+            Acabando: {{ produto.estoque === 1 ? 'resta 1' : 'restam ' + produto.estoque }}
+          </span>
+        }
+      }
+
       <p class="truck">{{ produto.truck }} · {{ produto.categoria }}</p>
-      <p><b>Preço: {{ precoFormatado }}</b></p>
+      <p class="preco"><b>Preço: {{ precoFormatado }}</b></p>
 
       @if (noCarrinho) {
-        <ion-button color="medium" (click)="remover.emit(produto)">Remover do combo</ion-button>
+        <ion-button class="btn-remover" color="medium" (click)="remover.emit(produto)">Remover do combo</ion-button>
       } @else {
-        <ion-button [disabled]="situacao === 'esgotado'" (click)="adicionar.emit(produto)">
+        <ion-button class="btn-adicionar" [disabled]="situacao === 'esgotado'" (click)="adicionar.emit(produto)">
           Adicionar ao combo
         </ion-button>
       }
